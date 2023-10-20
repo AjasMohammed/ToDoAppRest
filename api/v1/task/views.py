@@ -10,10 +10,9 @@ class AddTask(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
 
-class UpdateTask(generics.UpdateAPIView):
-    serializer_class = UpdateTaskSerializer
+class TaskIsDeleted(generics.UpdateAPIView):
+    serializer_class = TaskIsDeletedSerializer
     permission_classes = [IsAuthenticated]
-
     
     def get_queryset(self):
         user = self.request.user
@@ -22,14 +21,39 @@ class UpdateTask(generics.UpdateAPIView):
         return queryset
 
     def update(self, request, *args, **kwargs):
+        data = {"is_deleted": True}
 
         instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer = self.get_serializer(instance, data=data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
         response_data = {'message': 'Task updated successfully!'}
         return Response(response_data)   
+
+
+class TaskIsDone(generics.UpdateAPIView):
+    serializer_class = TaskIsDoneSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Task.objects.filter(user=user)
+
+        return queryset
+
+    def update(self, request, *args, **kwargs):
+
+        data = {'is_done': True}
+
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        response_data = {'message': 'Task updated successfully!'}
+        return Response(response_data)   
+
 
 class ViewTask(generics.ListAPIView):
     permission_classes = [IsAuthenticated]

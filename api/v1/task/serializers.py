@@ -24,20 +24,25 @@ class TaskSerializer(serializers.ModelSerializer):
         return task
 
 
-class UpdateTaskSerializer(serializers.Serializer):
+class TaskIsDeletedSerializer(serializers.Serializer):
     is_deleted = serializers.BooleanField(required=False, default=None)
-    is_done = serializers.BooleanField(required=False, default=None)
 
 
     def update(self,instance, validated_data):
         is_deleted = validated_data.get('is_deleted', None)
-        is_done = validated_data.get('is_done', None)
         
         if is_deleted:
             instance.is_deleted = is_deleted
+        instance.save()
+        return instance
+    
+    
+class TaskIsDoneSerializer(serializers.Serializer):
+    is_done = serializers.BooleanField(required=False, default=None)
+
+    def update(self,instance, validated_data):
+        is_done = validated_data.get('is_done', None)
         if is_done:
             instance.is_done = is_done
-        
         instance.save()
-
         return instance
